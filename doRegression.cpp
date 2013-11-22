@@ -15,9 +15,9 @@ Polynomial doRegression(const Vector& x, const Vector& y, const Vector& lower, c
   double min_cost=calculateCost(guess,x,y);
   Polynomial best=guess;
   double max_x=x.back();
-  double min=-10;
-  double max=10;
-  double inc=0.3;
+  double min=-15;
+  double max=15;
+  double inc=0.2;
   int dim=DIM;
   for(int i=0;i<=dim;++i){
     if(mask.size()-1<i || mask[i]==0)
