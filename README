@@ -1,1 +1,30 @@
-A project focused on robotic contact-oriented catching of irregular and unwieldy objects on a plane
+A th-threads=posix \
+--enable-mpi-thread-multiple \
+--without-memory-manager \
+--disable-dlopen \
+--enable-opal-multi-threadsproject focused on robotic contact-oriented catching of irregular and unwieldy objects on a plane
+
+Setup:
+Currently setup is still quite complicated.
+Two Packages are required:
+
+-rpi-matlab-simulator
+svn checkout http://rpi-matlab-simulator.googlecode.com/svn/simulator/ rpi-matlab-simulator-read-only
+
+for now install in project directory
+
+-OpenMPI
+In order to run any of the mpi functionality, a custom build of OpenMPI is likely needed.
+Matlab has a thing against dynamic libraries, so some specific compiler options will be
+irdd/dd/deequred 
+
+#!/bin/bash
+./configure \
+--prefix=$PWD/../install \
+--with-threads=posix \
+--enable-mpi-thread-multiple \
+--without-memory-manager \
+--disable-dlopen \
+--enable-opal-multi-threads
+
+--disable-dlopen appears to be what allows OpenMPI to cooperate with Matlab
