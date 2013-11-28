@@ -1,8 +1,8 @@
-all:test planTrajectory.mexa64
+all:bin/test bin/planTrajectory.mexa64
 
-test:test.cpp doRegression.cpp Polynomial.cpp
-	g++ -g  doRegression.cpp Polynomial.cpp test.cpp -o test
-planTrajectory.mexa64:doRegression.cpp Polynomial.cpp planTrajectory.cpp
-	mex -g planTrajectory.cpp doRegression.cpp Polynomial.cpp
+bin/test:src/test.cc src/doRegression.cc src/Polynomial.cc
+	g++ -g  -Iinclude src/doRegression.cc src/Polynomial.cc src/test.cc -o bin/test
+bin/planTrajectory.mexa64:src/doRegression.cc src/Polynomial.cc src/planTrajectory.cc
+	mex -outdir bin -DGRADIENT -g -Iinclude src/planTrajectory.cc src/doRegression.cc src/Polynomial.cc
 
 .PHONY:all
