@@ -71,14 +71,15 @@ Polynomial gradientDescent(const Vector& x, const Vector& y, const Vector& lower
   Polynomial poly, new_poly, best_poly;
   best_poly=poly=new_poly=guess;
   Vector grad;
-  double best_cost, curr_cost, prev_cost;
-  best_cost=curr_cost=prev_cost=calculateCost(poly,upper,lower,x,y);
+  double best_cost, curr_cost, prev_cost, cost_before_line_search;
+  best_cost=curr_cost=prev_cost=cost_before_line_search=calculateCost(poly,upper,lower,x,y);
   double a;
   int fail=0;
   int dim=DIM;
   int num=0;
 
   //ensure that you are starting with a valid guess
+  /*
   while(!isValid(poly,lower,upper,x.back())){
     for(int i=0;i<=poly.order();++i){
       if(mask.size()-1<i || ABS(mask[i])<1){
@@ -86,11 +87,13 @@ Polynomial gradientDescent(const Vector& x, const Vector& y, const Vector& lower
       }
     }
   }
+  */
   while(fail++<100 && num<2e4){
     grad=calculateGradient(poly,upper,lower,x,y,dim);
     a=1e-9;
 
-    while(num++<1e5){
+    cost_before_line_search=prev_cost;
+    while(num++<1e5 && cost_before_line_search>prev_cost*0.75){
       new_poly=poly;
       for(int i=0;i<=dim;++i){
         if(mask.size()-1<i || ABS(mask[i])<1){
@@ -100,7 +103,7 @@ Polynomial gradientDescent(const Vector& x, const Vector& y, const Vector& lower
       //-- std::cerr << "Candidate: " << poly << std::endl;
 
       //if(isValid(new_poly,lower,upper,1.2*x.back())){
-      if(isValid(new_poly,lower,upper,x.back())){
+      //if(isValid(new_poly,lower,upper,x.back())){
         curr_cost=calculateCost(new_poly,upper,lower,x,y);
         if(curr_cost<=prev_cost){
           poly=new_poly;
@@ -111,18 +114,19 @@ Polynomial gradientDescent(const Vector& x, const Vector& y, const Vector& lower
 
           if(curr_cost<best_cost){
             best_poly=poly;
+            best_cost=curr_cost;
           }
-        }else{
+        //}else{
           //--std::cerr << "Failed due to cost, best: " << prev_cost << " curr: " << curr_cost << std::endl;
-          break;
-        }
+          //break;
+        //}
       }else{
         //--std::cerr << "Failed validity test" << std::endl;
         break;
       }
     }
   }
-  std::cout << "Num tests: " << num << std::endl;
+  std::cout << "Num tests: " << num << " Final cost: " << best_cost << std::endl;
   return best_poly;
 }
 
@@ -182,9 +186,11 @@ static double calculateCost(Polynomial& poly, const Vector& upper, const Vector&
     if(isfinite(y[i]) && isfinite(x[i])){
       val=poly(x[i]);
       diff=ABS(val-y[i]);
+      //ave_error+=diff*diff;
       ave_error+=diff;
       if(diff<min_error) min_error=diff;
 
+#if 1
       if(upper.size()){
         temp=(val-upper[0])+(upper[0]-lower[0])/30;
         boundary+=(temp>0?temp*temp:0);
@@ -194,13 +200,14 @@ static double calculateCost(Polynomial& poly, const Vector& upper, const Vector&
         boundary+=(temp>0?temp*temp:0);
       }
       derivatives[0]=val;
+#endif
 #if 0
       for(int j=1; j<num_d_const && j<=i ;++j){
         derivatives[j]=(derivatives[j-1]-prev_derivatives[j-1])/(x[0]-x[1]);
 
-        temp=(val-upper[j])+(upper[j]-lower[j])/30;
+        temp=(derivatives[j]-upper[j])+(upper[j]-lower[j])/30;
         boundary+=(temp>0?temp*temp:0);
-        temp=(lower[j]-val)+(upper[j]-lower[j])/30;
+        temp=(lower[j]-derivatives[j])+(upper[j]-lower[j])/30;
         boundary+=(temp>0?temp*temp:0);
       }
 #endif
@@ -208,7 +215,8 @@ static double calculateCost(Polynomial& poly, const Vector& upper, const Vector&
   }
   ave_error/=x.size();
   //-- std::cout << "Cost is: " << error << std::endl;
-  return ave_error+0.5*min_error+0.5*boundary;
+  //return ave_error+0.5*min_error+0.5*boundary;
+  return ave_error+0.5*boundary;
   //return ave_error+min_error;
 }
 

@@ -1,9 +1,9 @@
-function [path,time]=runTest(block_u, block_nu, hand_control)
+function [path]=runTest(block_u, block_nu, hand_control, step)
 
   %%%%%%%%%%%%%%%%%%%%
   %Basic initialization steps
   %%%%%%%%%%%%%%%%%%%%
-  sim=Simulator(0.00125);
+  sim=Simulator(step);
   sim.MAX_STEP=2000;
   sim.interactive=false;
   sim.draw=true;
@@ -20,6 +20,7 @@ function [path,time]=runTest(block_u, block_nu, hand_control)
   sim.userFunction = @manageTest;
   sim.userData.init_tracking=1;
   sim.userData.handInit=[hand_control(1,1);hand_control(1,2);0.045];
+  %sim.userData.handInit2=[hand_control(1,3);hand_control(1,4);0.045];
   sim.userData.block_u=block_u;
   sim.userData.block_nu=block_nu;
   %This will become the basis for the return value
@@ -60,7 +61,7 @@ function [path,time]=runTest(block_u, block_nu, hand_control)
   %sim.userData.quatInit=block.quat;
   
   % Finger
-  finger=mesh_cylinder(9,80,0.05,0.07);
+  finger1=mesh_cylinder(9,80,0.04,0.07);
       %finger.dynamic=false
       finger.dynamic=true;
       finger.color=[0.1 0.2 0.3];
@@ -68,12 +69,21 @@ function [path,time]=runTest(block_u, block_nu, hand_control)
       %finger.u=qtrotate(block.quat,[0;1.1;0.035]);
       finger.u=sim.userData.handInit;
 
+  %finger2=mesh_cylinder(9,80,0.04,0.07);
+      %finger.dynamic=false
+      %finger.dynamic=true;
+      %finger.color=[0.1 0.2 0.3];
+      %finger.quat=block.quat;
+      %finger.u=qtrotate(block.quat,[0;1.1;0.035]);
+      %finger.u=sim.userData.handInit2;
+
   %%%%%%%%%%%%%%%%%%
   %Initiate the simulation passing off to user function
   %%%%%%%%%%%%%%%%%%
 
   % Add bodies to simulator
-  sim = sim_addBody(sim, [ramp block finger]);
+  %sim = sim_addBody(sim, [ramp block finger1 finger2]);
+  sim = sim_addBody(sim, [ramp block finger1]);
 
   % Run the simulator
   sim = sim_run( sim );
