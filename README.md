@@ -7,11 +7,12 @@ For the the most part nothing needs to be built except for experimental componen
 Primarily, you will need to download the rpi-matlab-simulator to the source folder.
 
 After
-# Dependencies:
+## Dependencies:
 
 * rpi-matlab-simulator
+```
 svn checkout http://rpi-matlab-simulator.googlecode.com/svn/simulator/ rpi-matlab-simulator-read-only
-
+```
 for now install install the simulator into the project directory
 
 * OpenMPI
@@ -30,4 +31,7 @@ Matlab has a thing against dynamic libraries, so some specific compiler options 
 --enable-opal-multi-threads
 ```
 note:
---disable-dlopen appears to be what allows OpenMPI to cooperate with Matlab
+```
+--disable-dlopen
+```
+appears to be what allows OpenMPI to cooperate with Matlab
